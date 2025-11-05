@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>协助老人移至洗手间 - 操作流程</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.8/dist/chart.umd.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#2563eb',
+                        secondary: '#4f46e5',
+                        accent: '#f97316',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        danger: '#ef4444',
+                        neutral: '#64748b',
+                        light: '#f1f5f9',
+                        dark: '#1e293b'
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .transition-height {
+                transition: max-height 0.5s ease-in-out;
+            }
+            .card-hover {
+                @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+            }
+            .progress-line {
+                @apply absolute h-1 bg-primary rounded-full transition-all duration-500;
+            }
+        }
+        
+        /* 打印样式优化 */
+        @media print {
+            header, footer, .sticky, #resetProgressBtn {
+                display: none !important;
+            }
+            .step-content {
+                display: block !important;
+            }
+            .step-card {
+                page-break-inside: avoid;
+                margin-bottom: 1rem;
+            }
+            body {
+                background: white !important;
+            }
+            .bg-gradient-to-r {
+                background: #2563eb !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        /* 无障碍改进 */
+        .focus-visible:focus {
+            outline: 2px solid #2563eb;
+            outline-offset: 2px;
+        }
+        
+        /* 加载动画 */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 text-dark">
+    <!-- 顶部导航 -->
+    <header class="sticky top-0 z-50 bg-white shadow-md transition-all duration-300" id="navbar">
+        <div class="container mx-auto px-4 py-3 flex justify-between items-center">
+            <div class="flex items-center space-x-2">
+                <i class="fa fa-heartbeat text-primary text-2xl"></i>
+                <h1 class="text-xl md:text-2xl font-bold text-primary">老年护理操作流程</h1>
+            </div>
+            <nav class="hidden md:flex space-x-6">
+                <a href="#" class="font-medium text-primary hover:text-secondary transition-colors">首页</a>
+                <a href="#" class="font-medium text-gray-600 hover:text-primary transition-colors">全部流程</a>
+                <a href="#" class="font-medium text-gray-600 hover:text-primary transition-colors">护理指南</a>
+                <a href="#" class="font-medium text-gray-600 hover:text-primary transition-colors">关于我们</a>
+            </nav>
+            <button class="md:hidden text-gray-600" id="menuToggle">
+                <i class="fa fa-bars text-xl"></i>
+            </button>
+        </div>
+        <!-- 移动端菜单 -->
+        <div class="md:hidden bg-white shadow-lg absolute w-full left-0 top-full transform -translate-y-full opacity-0 transition-all duration-300 pointer-events-none" id="mobileMenu">
+            <div class="container mx-auto px-4 py-3 flex flex-col space-y-3">
+                <a href="#" class="font-medium text-primary py-2 border-b border-gray-100">首页</a>
+                <a href="#" class="font-medium text-gray-600 py-2 border-b border-gray-100 hover:text-primary transition-colors">全部流程</a>
+                <a href="#" class="font-medium text-gray-600 py-2 border-b border-gray-100 hover:text-primary transition-colors">护理指南</a>
+                <a href="#" class="font-medium text-gray-600 py-2 hover:text-primary transition-colors">关于我们</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主横幅 -->
+    <section class="bg-gradient-to-r from-primary to-secondary text-white py-12 md:py-20">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto text-center">
+                <h2 class="text-2xl md:text-4xl font-bold mb-4 text-shadow">协助老人移至洗手间</h2>
+                <p class="text-lg md:text-xl opacity-90 mb-8">专业护理操作流程指南，确保老人安全与舒适</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <button onclick="window.print()" class="bg-white text-primary font-medium px-6 py-3 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 flex items-center">
+                        <i class="fa fa-print mr-2"></i> 打印流程
+                    </button>
+                    <button id="resetProgressBtn" class="bg-transparent border-2 border-white text-white font-medium px-6 py-3 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center">
+                        <i class="fa fa-refresh mr-2"></i> 重置进度
+                    </button>
+                    <button class="bg-transparent border-2 border-white text-white font-medium px-6 py-3 rounded-lg hover:bg-white/10 transition-all duration-300 flex items-center">
+                        <i class="fa fa-download mr-2"></i> 下载指南
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Toast 通知容器 -->
+    <div id="toastContainer" class="fixed top-20 right-4 z-50 space-y-2"></div>
+    
+    <!-- 进度指示器 -->
+    <section class="bg-white py-6 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <!-- 进度说明 -->
+                <div class="mb-4 text-center">
+                    <p class="text-sm text-gray-600">
+                        <i class="fa fa-lightbulb-o text-warning"></i> 
+                        提示: 使用方向键或数字键1-6快速导航步骤
+                    </p>
+                </div>
+                <div class="relative">
+                    <div class="progress-line w-0" id="progressBar"></div>
+                    <div class="flex justify-between relative z-10">
+                        <div class="flex flex-col items-center" data-step="1">
+                            <div class="w-10 h-10 rounded-full bg-primary text-white flex items-center justify-center font-bold mb-2 step-circle">2.1</div>
+                            <span class="text-sm hidden md:block">评估环境</span>
+                        </div>
+                        <div class="flex flex-col items-center" data-step="2">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2 step-circle">2.2</div>
+                            <span class="text-sm hidden md:block">评估老人状态</span>
+                        </div>
+                        <div class="flex flex-col items-center" data-step="3">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2 step-circle">2.3</div>
+                            <span class="text-sm hidden md:block">选择移动方式</span>
+                        </div>
+                        <div class="flex flex-col items-center" data-step="4">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2 step-circle">2.4</div>
+                            <span class="text-sm hidden md:block">准备移动</span>
+                        </div>
+                        <div class="flex flex-col items-center" data-step="5">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2 step-circle">2.5</div>
+                            <span class="text-sm hidden md:block">执行移动</span>
+                        </div>
+                        <div class="flex flex-col items-center" data-step="6">
+                            <div class="w-10 h-10 rounded-full bg-gray-200 text-gray-600 flex items-center justify-center font-bold mb-2 step-circle">2.6</div>
+                            <span class="text-sm hidden md:block">确认安全</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 主要内容 -->
+    <main class="container mx-auto px-4 py-10">
+        <div class="max-w-5xl mx-auto">
+            <!-- 概述卡片 -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-10">
+                <div class="flex items-start">
+                    <div class="bg-blue-100 p-3 rounded-lg mr-4">
+                        <i class="fa fa-info-circle text-primary text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold mb-2">操作概述</h3>
+                        <p class="text-gray-600">协助老人移至洗手间是日常护理中的重要环节，需要充分评估环境与老人状态，选择合适的移动方式，确保操作过程安全、平稳，避免意外发生。本流程提供了系统化的操作指南，适用于各类护理场景。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 风险等级图表 -->
+            <div class="bg-white rounded-xl shadow-md p-6 mb-10">
+                <h3 class="text-xl font-semibold mb-4">环境风险评估标准</h3>
+                <div class="h-64 md:h-80">
+                    <canvas id="riskChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 流程步骤 -->
+            <div class="space-y-8">
+                <!-- 2.1 评估场景环境 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden step-card" data-step="1">
+                    <div class="bg-primary text-white p-5 cursor-pointer step-header">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold mr-3">2.1</div>
+                                <h3 class="text-xl font-semibold">评估场景环境</h3>
+                            </div>
+                            <i class="fa fa-chevron-down transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5 step-content">
+                        <p class="text-gray-600 mb-6">全面评估洗手间及周边环境，确保空间安全、适合老人移动和使用。</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <!-- 2.1.1 评估物理空间 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                        <span class="text-primary font-medium">2.1.1</span>
+                                    </div>
+                                    <h4 class="font-semibold">评估物理空间</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>测量空间大小（是否≥4㎡）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查通道宽度（轮椅是否可通过）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>确认操作空间（是否能转身）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查门宽（是否便于进出）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.1.2 评估地面状况 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                        <span class="text-primary font-medium">2.1.2</span>
+                                    </div>
+                                    <h4 class="font-semibold">评估地面状况</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查地面材质（瓷砖/水泥/木地板）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查干湿程度（干燥/潮湿/积水）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查平整度（平整/有高差/凹凸）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>识别障碍物（门槛/杂物）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.1.3 检查安全设施 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                        <span class="text-primary font-medium">2.1.3</span>
+                                    </div>
+                                    <h4 class="font-semibold">检查安全设施</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查墙面扶手（有无/位置/牢固度）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查防滑垫（有无/固定情况）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查照明（明亮/昏暗）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-primary mt-1 mr-2"></i>
+                                        <span>检查马桶扶手（有无/高度适合）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.1.4 评估环境风险等级 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                                        <span class="text-primary font-medium">2.1.4</span>
+                                    </div>
+                                    <h4 class="font-semibold">评估环境风险等级</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>低风险（干燥+扶手+空间足）→ 标准流程</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>中风险（部分条件不足）→ 增加防护</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>高风险（湿滑+无扶手+空间小）→ 考虑备选方案</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-primary">
+                            <h5 class="font-medium text-primary mb-1">操作要点</h5>
+                            <p class="text-gray-600 text-sm">同时评估物理空间、地面状况和安全设施，综合判断风险等级，根据风险等级决定后续方案。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2.2 评估老人当前状态 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden step-card" data-step="2">
+                    <div class="bg-primary/90 text-white p-5 cursor-pointer step-header">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold mr-3">2.2</div>
+                                <h3 class="text-xl font-semibold">评估老人当前状态</h3>
+                            </div>
+                            <i class="fa fa-chevron-down transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5 step-content hidden">
+                        <p class="text-gray-600 mb-6">了解老人的身体状况、行动能力和配合程度，为选择合适的移动方式提供依据。</p>
+                        
+                        <div class="grid md:grid-cols-3 gap-6 mb-6">
+                            <!-- 2.2.1 评估身体状况 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                        <span class="text-secondary font-medium">2.2.1</span>
+                                    </div>
+                                    <h4 class="font-semibold">评估身体状况</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>询问是否感到不适</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>观察精神状态（清醒/困倦/烦躁）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>评估疼痛程度（有无疼痛）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>检查血压心率（如有必要）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.2.2 评估行动能力 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                        <span class="text-secondary font-medium">2.2.2</span>
+                                    </div>
+                                    <h4 class="font-semibold">评估行动能力</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>观察肢体活动情况</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>测试站立能力（能否独立站立）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>评估平衡能力（站稳/摇晃）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>判断负重能力（能否自行行走）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.2.3 评估配合程度 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center mr-3">
+                                        <span class="text-secondary font-medium">2.2.3</span>
+                                    </div>
+                                    <h4 class="font-semibold">评估配合程度</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>主动配合（理解指令、愿意配合）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>被动配合（需要引导但不抗拒）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>情绪不稳（犹豫、焦虑）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-secondary mt-1 mr-2"></i>
+                                        <span>抗拒配合（拒绝、抵触）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-indigo-50 p-4 rounded-lg border-l-4 border-secondary">
+                            <h5 class="font-medium text-secondary mb-1">操作要点</h5>
+                            <p class="text-gray-600 text-sm">先评估身体状况和行动能力，再根据结果判断配合程度，综合评估决定移动方案。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2.3 选择移动方式 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden step-card" data-step="3">
+                    <div class="bg-primary/80 text-white p-5 cursor-pointer step-header">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold mr-3">2.3</div>
+                                <h3 class="text-xl font-semibold">选择移动方式</h3>
+                            </div>
+                            <i class="fa fa-chevron-down transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5 step-content hidden">
+                        <p class="text-gray-600 mb-6">根据环境评估和老人状态，选择最安全、合适的移动方式。</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <!-- 2.3.1 独立行走 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <span class="text-success font-medium">2.3.1</span>
+                                    </div>
+                                    <h4 class="font-semibold">独立行走</h4>
+                                </div>
+                                <p class="text-sm text-gray-500 mb-3 pl-11">适用：行动自如、环境安全</p>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>仅需语言引导和陪同</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.3.2 轻度搀扶 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <span class="text-success font-medium">2.3.2</span>
+                                    </div>
+                                    <h4 class="font-semibold">轻度搀扶</h4>
+                                </div>
+                                <p class="text-sm text-gray-500 mb-3 pl-11">适用：基本能走、略需支持</p>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>单侧搀扶（一侧支撑）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>双侧搀扶（两侧护理员协助）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.3.3 使用助行器 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <span class="text-success font-medium">2.3.3</span>
+                                    </div>
+                                    <h4 class="font-semibold">使用助行器</h4>
+                                </div>
+                                <p class="text-sm text-gray-500 mb-3 pl-11">适用：能站立、需辅助平衡</p>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>检查助行器状态（稳固/高度合适）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>确认老人会使用</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.3.4 使用轮椅 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <span class="text-success font-medium">2.3.4</span>
+                                    </div>
+                                    <h4 class="font-semibold">使用轮椅</h4>
+                                </div>
+                                <p class="text-sm text-gray-500 mb-3 pl-11">适用：无法站立或长距离行走</p>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>检查轮椅状态（刹车/轮胎/扶手）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>确认通道宽度足够</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>准备轮椅定位</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.3.5 床边更换 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover md:col-span-2">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                                        <span class="text-success font-medium">2.3.5</span>
+                                    </div>
+                                    <h4 class="font-semibold">床边更换</h4>
+                                </div>
+                                <p class="text-sm text-gray-500 mb-3 pl-11">适用：完全无法移动或环境高风险</p>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-success mt-1 mr-2"></i>
+                                        <span>放弃移至洗手间，改在床边操作</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-success">
+                            <h5 class="font-medium text-success mb-1">操作要点</h5>
+                            <p class="text-gray-600 text-sm">根据环境评估和老人状态评估结果，从上述五种方式中选择最安全合适的一种方式。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2.4 准备移动 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden step-card" data-step="4">
+                    <div class="bg-primary/70 text-white p-5 cursor-pointer step-header">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold mr-3">2.4</div>
+                                <h3 class="text-xl font-semibold">准备移动</h3>
+                            </div>
+                            <i class="fa fa-chevron-down transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5 step-content hidden">
+                        <p class="text-gray-600 mb-6">做好移动前的各项准备工作，包括沟通、设备准备、防护措施和护理人员自身准备。</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <!-- 2.4.1 与老人充分沟通 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-3">
+                                        <span class="text-accent font-medium">2.4.1</span>
+                                    </div>
+                                    <h4 class="font-semibold">与老人充分沟通</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>说明要去洗手间</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>告知移动方式</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>询问是否准备好</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>说明配合要点</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.4.2 准备辅助设备 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-3">
+                                        <span class="text-accent font-medium">2.4.2</span>
+                                    </div>
+                                    <h4 class="font-semibold">准备辅助设备</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>将助行器/轮椅移至床边</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>锁定刹车装置</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>调整设备高度/位置</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>清理移动路径障碍物</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.4.3 采取防护措施 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-3">
+                                        <span class="text-accent font-medium">2.4.3</span>
+                                    </div>
+                                    <h4 class="font-semibold">采取防护措施</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>铺设防滑垫（如地面湿滑）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>开启照明（如光线不足）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>呼叫协助人员（如需两人配合）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>准备防跌倒护具（如必要）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.4.4 护理人员自我准备 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center mr-3">
+                                        <span class="text-accent font-medium">2.4.4</span>
+                                    </div>
+                                    <h4 class="font-semibold">护理人员自我准备</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>站在老人安全侧</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>调整自身姿势（防止腰部受伤）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>准备好抓握位置</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-accent mt-1 mr-2"></i>
+                                        <span>确认紧急呼叫设备可用</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-orange-50 p-4 rounded-lg border-l-4 border-accent">
+                            <h5 class="font-medium text-accent mb-1">操作要点</h5>
+                            <p class="text-gray-600 text-sm">先与老人沟通，同时准备设备和防护措施，最后护理人员到位准备。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2.5 执行移动 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden step-card" data-step="5">
+                    <div class="bg-primary/60 text-white p-5 cursor-pointer step-header">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold mr-3">2.5</div>
+                                <h3 class="text-xl font-semibold">执行移动</h3>
+                            </div>
+                            <i class="fa fa-chevron-down transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5 step-content hidden">
+                        <p class="text-gray-600 mb-6">按照选定的移动方式，平稳、安全地协助老人移动至洗手间。</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <!-- 2.5.1 协助起身 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                                        <span class="text-warning font-medium">2.5.1</span>
+                                    </div>
+                                    <h4 class="font-semibold">协助起身（如老人坐着/躺着）</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>让老人移至床边/椅边</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>让老人双脚着地</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>数"1-2-3"同步发力</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>托扶老人腋下或握住双手</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>缓慢协助站起</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>确认站稳后再松手</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.5.2 开始移动 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                                        <span class="text-warning font-medium">2.5.2</span>
+                                    </div>
+                                    <h4 class="font-semibold">开始移动</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>保持稳定速度（缓慢、匀速）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>护理人员与老人同步</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>语言提示（"小心台阶""扶好扶手"）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>观察老人状态（面色/呼吸/步态）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>随时准备应对突发状况</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.5.3 通过障碍/转弯 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                                        <span class="text-warning font-medium">2.5.3</span>
+                                    </div>
+                                    <h4 class="font-semibold">通过障碍/转弯</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>提前告知（"前面有门槛"）</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>放慢速度</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>增加搀扶力度</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>转弯时弧度放大</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.5.4 进入洗手间 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center mr-3">
+                                        <span class="text-warning font-medium">2.5.4</span>
+                                    </div>
+                                    <h4 class="font-semibold">进入洗手间</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>确认门已完全打开</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>检查地面无积水</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>协助跨过门槛</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-warning mt-1 mr-2"></i>
+                                        <span>引导至马桶旁</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-amber-50 p-4 rounded-lg border-l-4 border-warning">
+                            <h5 class="font-medium text-warning mb-1">操作要点</h5>
+                            <p class="text-gray-600 text-sm">按顺序执行起身→移动→通过障碍→进入洗手间，如老人已站立则跳过起身步骤，过程中持续观察并随时调整。</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 2.6 到达后确认安全 -->
+                <div class="bg-white rounded-xl shadow-md overflow-hidden step-card" data-step="6">
+                    <div class="bg-primary/50 text-white p-5 cursor-pointer step-header">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center font-bold mr-3">2.6</div>
+                                <h3 class="text-xl font-semibold">到达后确认安全</h3>
+                            </div>
+                            <i class="fa fa-chevron-down transition-transform duration-300"></i>
+                        </div>
+                    </div>
+                    <div class="p-5 step-content hidden">
+                        <p class="text-gray-600 mb-6">到达洗手间后，确保老人安全定位，状态稳定，为后续操作做好准备。</p>
+                        
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <!-- 2.6.1 协助定位站立 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                        <span class="text-danger font-medium">2.6.1</span>
+                                    </div>
+                                    <h4 class="font-semibold">协助定位站立</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>引导至马桶正前方/侧方</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>确保双脚站稳</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>让老人手扶扶手/马桶扶手</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>护理人员就位支撑位置</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.6.2 或协助轮椅定位 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                        <span class="text-danger font-medium">2.6.2</span>
+                                    </div>
+                                    <h4 class="font-semibold">或协助轮椅定位（如使用轮椅）</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>将轮椅推至适当位置</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>锁定刹车</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>收起脚踏板</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>协助老人站起或调整姿势</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.6.3 检查老人状态 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                        <span class="text-danger font-medium">2.6.3</span>
+                                    </div>
+                                    <h4 class="font-semibold">检查老人状态</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>询问"感觉怎么样？"</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>观察是否气喘/出汗</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>观察面色是否正常</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>确认无头晕/不适</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.6.4 调整环境便于操作 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                        <span class="text-danger font-medium">2.6.4</span>
+                                    </div>
+                                    <h4 class="font-semibold">调整环境便于操作</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>调整老人站立角度</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>确保护理人员操作空间</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>将更换用品放在顺手位置</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>确认隐私保护（关门/拉帘）</span>
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <!-- 2.6.5 最终确认可以进行下一步 -->
+                            <div class="border border-gray-100 rounded-lg p-5 card-hover md:col-span-2">
+                                <div class="flex items-center mb-3">
+                                    <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mr-3">
+                                        <span class="text-danger font-medium">2.6.5</span>
+                                    </div>
+                                    <h4 class="font-semibold">最终确认可以进行下一步</h4>
+                                </div>
+                                <ul class="space-y-2 text-gray-600 pl-11 text-sm">
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>老人站稳或坐稳</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>环境安全无风险</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>用品准备齐全</span>
+                                    </li>
+                                    <li class="flex items-start">
+                                        <i class="fa fa-check-circle text-danger mt-1 mr-2"></i>
+                                        <span>向老人说明"现在开始更换"</span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-red-50 p-4 rounded-lg border-l-4 border-danger">
+                            <h5 class="font-medium text-danger mb-1">操作要点</h5>
+                            <p class="text-gray-600 text-sm">根据选择的移动方式协助老人定位，检查状态，调整环境，确认一切就绪后进入下一步。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 底部导航按钮 -->
+    <nav class="sticky bottom-0 bg-white shadow-lg py-4 z-40" role="navigation" aria-label="步骤导航">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto flex justify-between items-center">
+                <button 
+                    class="px-6 py-3 bg-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-300 transition-colors flex items-center focus-visible" 
+                    id="prevBtn" 
+                    disabled
+                    aria-label="返回上一步">
+                    <i class="fa fa-arrow-left mr-2" aria-hidden="true"></i> 上一步
+                </button>
+                <div class="text-sm text-gray-600 hidden md:block">
+                    <span id="stepIndicator">步骤 <strong id="currentStepNum">1</strong> / 6</span>
+                </div>
+                <button 
+                    class="px-6 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 transition-colors flex items-center focus-visible" 
+                    id="nextBtn"
+                    aria-label="进入下一步">
+                    下一步 <i class="fa fa-arrow-right ml-2" aria-hidden="true"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 页脚 -->
+    <footer class="bg-dark text-white py-10 mt-10">
+        <div class="container mx-auto px-4">
+            <div class="max-w-5xl mx-auto">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div>
+                        <div class="flex items-center space-x-2 mb-4">
+                            <i class="fa fa-heartbeat text-primary text-2xl"></i>
+                            <h3 class="text-xl font-bold">老年护理指南</h3>
+                        </div>
+                        <p class="text-gray-400">提供专业、系统的老年护理操作流程，助力护理人员提升服务质量，保障老年人安全与健康。</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">快速链接</h4>
+                        <ul class="space-y-2 text-gray-400">
+                            <li><a href="#" class="hover:text-primary transition-colors">护理流程大全</a></li>
+                            <li><a href="#" class="hover:text-primary transition-colors">安全操作指南</a></li>
+                            <li><a href="#" class="hover:text-primary transition-colors">常见问题解答</a></li>
+                            <li><a href="#" class="hover:text-primary transition-colors">护理技巧分享</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4">联系我们</h4>
+                        <ul class="space-y-2 text-gray-400">
+                            <li class="flex items-center"><i class="fa fa-envelope mr-2 text-primary"></i> contact@nursing-guide.com</li>
+                            <li class="flex items-center"><i class="fa fa-phone mr-2 text-primary"></i> 400-123-4567</li>
+                            <li class="flex items-center"><i class="fa fa-map-marker mr-2 text-primary"></i> 北京市海淀区护理大厦</li>
+                        </ul>
+                        <div class="flex space-x-4 mt-4">
+                            <a href="#" class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-weixin"></i></a>
+                            <a href="#" class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-weibo"></i></a>
+                            <a href="#" class="w-8 h-8 rounded-full bg-gray-700 flex items-center justify-center hover:bg-primary transition-colors"><i class="fa fa-youtube-play"></i></a>
+                        </div>
+                    </div>
+                </div>
+                <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-500">
+                    <p>© 2023 老年护理指南 版权所有 | 京ICP备12345678号</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Toast 通知函数
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            
+            const colors = {
+                success: 'bg-success',
+                error: 'bg-danger',
+                warning: 'bg-warning',
+                info: 'bg-primary'
+            };
+            
+            const icons = {
+                success: 'fa-check-circle',
+                error: 'fa-exclamation-circle',
+                warning: 'fa-exclamation-triangle',
+                info: 'fa-info-circle'
+            };
+            
+            toast.className = `${colors[type]} text-white px-6 py-3 rounded-lg shadow-lg flex items-center space-x-2 fade-in max-w-sm`;
+            toast.innerHTML = `
+                <i class="fa ${icons[type]}"></i>
+                <span>${message}</span>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // 3秒后自动移除
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                toast.style.transition = 'all 0.3s ease-out';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // 风险等级图表
+        document.addEventListener('DOMContentLoaded', function() {
+            const ctx = document.getElementById('riskChart').getContext('2d');
+            const riskChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: ['空间大小', '通道宽度', '地面状况', '扶手设施', '照明条件', '障碍物情况'],
+                    datasets: [
+                        {
+                            label: '低风险',
+                            data: [90, 90, 90, 90, 90, 90],
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            borderColor: 'rgba(16, 185, 129, 1)',
+                            pointBackgroundColor: 'rgba(16, 185, 129, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(16, 185, 129, 1)'
+                        },
+                        {
+                            label: '中风险',
+                            data: [60, 60, 50, 50, 60, 50],
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)',
+                            borderColor: 'rgba(245, 158, 11, 1)',
+                            pointBackgroundColor: 'rgba(245, 158, 11, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(245, 158, 11, 1)'
+                        },
+                        {
+                            label: '高风险',
+                            data: [30, 30, 20, 20, 30, 20],
+                            backgroundColor: 'rgba(239, 68, 68, 0.2)',
+                            borderColor: 'rgba(239, 68, 68, 1)',
+                            pointBackgroundColor: 'rgba(239, 68, 68, 1)',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: 'rgba(239, 68, 68, 1)'
+                        }
+                    ]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: {
+                                display: true
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // 步骤交互
+            let currentStep = parseInt(localStorage.getItem('nursingStep')) || 1;
+            const totalSteps = 6;
+            const completedSteps = new Set(JSON.parse(localStorage.getItem('completedSteps') || '[]'));
+            
+            // 更新步骤显示
+            function updateStepDisplay() {
+                // 保存当前进度到localStorage
+                localStorage.setItem('nursingStep', currentStep);
+                
+                // 隐藏所有步骤内容
+                document.querySelectorAll('.step-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                
+                // 显示当前步骤内容
+                document.querySelector(`.step-card[data-step="${currentStep}"] .step-content`).classList.remove('hidden');
+                
+                // 更新步骤圆圈状态
+                document.querySelectorAll('.step-circle').forEach((circle, index) => {
+                    const stepNum = index + 1;
+                    if (completedSteps.has(stepNum) || stepNum < currentStep) {
+                        circle.classList.remove('bg-gray-200', 'text-gray-600', 'bg-primary');
+                        circle.classList.add('bg-success', 'text-white');
+                        circle.innerHTML = '<i class="fa fa-check"></i>';
+                    } else if (stepNum === currentStep) {
+                        circle.classList.remove('bg-gray-200', 'text-gray-600', 'bg-success');
+                        circle.classList.add('bg-primary', 'text-white');
+                        circle.textContent = '2.' + stepNum;
+                    } else {
+                        circle.classList.remove('bg-primary', 'text-white', 'bg-success');
+                        circle.classList.add('bg-gray-200', 'text-gray-600');
+                        circle.textContent = '2.' + stepNum;
+                    }
+                });
+                
+                // 更新进度条
+                const progressBar = document.getElementById('progressBar');
+                const progress = completedSteps.size > 0 ? 
+                    (completedSteps.size / totalSteps) * 100 : 
+                    ((currentStep - 1) / (totalSteps - 1)) * 100;
+                progressBar.style.width = `${progress}%`;
+                
+                // 更新按钮状态
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                
+                prevBtn.disabled = currentStep === 1;
+                if (prevBtn.disabled) {
+                    prevBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                } else {
+                    prevBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                }
+                
+                nextBtn.innerHTML = currentStep === totalSteps ? 
+                    '完成 <i class="fa fa-check ml-2" aria-hidden="true"></i>' : 
+                    '下一步 <i class="fa fa-arrow-right ml-2" aria-hidden="true"></i>';
+                
+                // 更新步骤指示器
+                const currentStepNum = document.getElementById('currentStepNum');
+                if (currentStepNum) {
+                    currentStepNum.textContent = currentStep;
+                }
+                
+                // 更新ARIA标签
+                nextBtn.setAttribute('aria-label', 
+                    currentStep === totalSteps ? '完成所有步骤' : `进入步骤 2.${currentStep + 1}`
+                );
+                
+                // 滚动到当前步骤
+                setTimeout(() => {
+                    const stepCard = document.querySelector(`.step-card[data-step="${currentStep}"]`);
+                    if (stepCard) {
+                        stepCard.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                }, 100);
+            }
+            
+            // 步骤头部点击事件
+            document.querySelectorAll('.step-header').forEach(header => {
+                header.addEventListener('click', function() {
+                    const step = parseInt(this.closest('.step-card').dataset.step);
+                    const content = this.nextElementSibling;
+                    const icon = this.querySelector('.fa-chevron-down');
+                    
+                    // 切换当前步骤的展开/收起状态
+                    if (currentStep === step && !content.classList.contains('hidden')) {
+                        content.classList.add('hidden');
+                        icon.classList.remove('rotate-180');
+                    } else {
+                        currentStep = step;
+                        updateStepDisplay();
+                        icon.classList.add('rotate-180');
+                    }
+                });
+            });
+            
+            // 下一步按钮
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                if (currentStep < totalSteps) {
+                    // 标记当前步骤为已完成
+                    completedSteps.add(currentStep);
+                    localStorage.setItem('completedSteps', JSON.stringify([...completedSteps]));
+                    
+                    showToast(`步骤 2.${currentStep} 已完成`, 'success');
+                    
+                    currentStep++;
+                    updateStepDisplay();
+                } else {
+                    // 标记最后一步为已完成
+                    completedSteps.add(currentStep);
+                    localStorage.setItem('completedSteps', JSON.stringify([...completedSteps]));
+                    updateStepDisplay();
+                    
+                    showToast('恭喜！所有步骤已完成！', 'success');
+                    
+                    // 完成所有步骤后显示提示
+                    setTimeout(() => {
+                        if (confirm('恭喜！已完成所有步骤。是否要重置进度重新开始？')) {
+                            localStorage.removeItem('nursingStep');
+                            localStorage.removeItem('completedSteps');
+                            location.reload();
+                        }
+                    }, 1000);
+                }
+            });
+            
+            // 上一步按钮
+            document.getElementById('prevBtn').addEventListener('click', function() {
+                if (currentStep > 1) {
+                    currentStep--;
+                    updateStepDisplay();
+                }
+            });
+            
+            // 添加键盘导航支持
+            document.addEventListener('keydown', function(e) {
+                // 左箭头或上箭头 - 上一步
+                if ((e.key === 'ArrowLeft' || e.key === 'ArrowUp') && currentStep > 1) {
+                    e.preventDefault();
+                    currentStep--;
+                    updateStepDisplay();
+                }
+                // 右箭头或下箭头 - 下一步
+                else if ((e.key === 'ArrowRight' || e.key === 'ArrowDown') && currentStep < totalSteps) {
+                    e.preventDefault();
+                    currentStep++;
+                    updateStepDisplay();
+                }
+                // 数字键 1-6 - 直接跳转到对应步骤
+                else if (e.key >= '1' && e.key <= '6') {
+                    e.preventDefault();
+                    currentStep = parseInt(e.key);
+                    updateStepDisplay();
+                }
+            });
+            
+            // 重置进度按钮
+            document.getElementById('resetProgressBtn').addEventListener('click', function() {
+                if (confirm('确定要重置所有进度吗？此操作不可恢复。')) {
+                    localStorage.removeItem('nursingStep');
+                    localStorage.removeItem('completedSteps');
+                    location.reload();
+                }
+            });
+            
+            // 移动端菜单
+            const menuToggle = document.getElementById('menuToggle');
+            const mobileMenu = document.getElementById('mobileMenu');
+            
+            menuToggle.addEventListener('click', function() {
+                if (mobileMenu.classList.contains('opacity-0')) {
+                    mobileMenu.classList.remove('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                    mobileMenu.classList.add('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                    menuToggle.innerHTML = '<i class="fa fa-times text-xl"></i>';
+                } else {
+                    mobileMenu.classList.add('-translate-y-full', 'opacity-0', 'pointer-events-none');
+                    mobileMenu.classList.remove('translate-y-0', 'opacity-100', 'pointer-events-auto');
+                    menuToggle.innerHTML = '<i class="fa fa-bars text-xl"></i>';
+                }
+            });
+            
+            // 滚动时导航栏效果
+            window.addEventListener('scroll', function() {
+                const navbar = document.getElementById('navbar');
+                if (window.scrollY > 50) {
+                    navbar.classList.add('py-2', 'shadow-lg');
+                    navbar.classList.remove('py-3', 'shadow-md');
+                } else {
+                    navbar.classList.add('py-3', 'shadow-md');
+                    navbar.classList.remove('py-2', 'shadow-lg');
+                }
+            });
+            
+            // 初始化显示
+            updateStepDisplay();
+        });
+    </script>
+</body>
+</html>
